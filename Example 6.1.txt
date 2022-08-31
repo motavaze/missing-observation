@@ -1,0 +1,244 @@
+library(psych)
+library(MASS)
+
+
+sigma0=diag(5)
+
+ph=0.5
+pl=0.05
+
+t=1
+##############################D1
+#D1 - Revstat
+x=matrix(c(
+1,1,1,1,
+-1,-1,-1,-1,
+-1,-1,-1,1,
+-1,-1,1,-1,
+-1,1,-1,-1,
+1,-1,-1,-1,
+-1,-1,1,1,
+-1,1,-1,1,
+1,-1,-1,1,
+-1,1,1,-1,
+1,-1,1,-1,
+1,1,-1,-1
+),12,4,byrow=T)
+
+
+
+di=diag(rep(1,12))
+
+
+mp1=c()
+for(i in 1:12)  {
+#if(sum(x[i,])==4 | sum(x[i,])==-4)  mp1[i]=ph
+if(sum(x[i,])==4 )  mp1[i]=ph
+else(mp1[i]=pl)
+               }
+pm=diag(mp1)
+###########    fully observed ,2factor interactions ##########
+ab=cbind(x[,1]*x[,2])
+ac=cbind(x[,1]*x[,3])
+ad=cbind(x[,1]*x[,4])
+bc=cbind(x[,2]*x[,3])
+bd=cbind(x[,2]*x[,4])
+cd=cbind(x[,3]*x[,4])
+
+m2=cbind(ab,ac,ad,bc,bd,cd)
+m=cbind(m2)
+m=as.data.frame(m)
+comb=combn(m,t,simplify=FALSE)
+qq=array(NA,dim=c(12,t,choose(ncol(m),t)))
+
+for(i in 1:choose(ncol(m),t)) {
+qq[,,i]=as.matrix(comb[[i]])
+}
+
+pp=array(NA,dim=c(12,4+t,choose(ncol(m),t)))
+
+for(i in 1:choose(ncol(m),t)) {
+pp[,,i]=cbind(x,qq[,,i])
+}
+
+k1=matrix(NA,choose(ncol(m),t),choose(ncol(m),t))
+for(i in 1:choose(ncol(m),t)) {
+    for(j in 1:choose(ncol(m),t)) {
+h=pp[,,j]%*%ginv(t(pp[,,j])%*%pp[,,j])%*%t(pp[,,j])
+if(i!=j) k1[i,j]=tr(t(pp[,,i])%*%(di-h)%*%pp[,,i]%*%sigma0)
+else  k1[i,j]=10000
+}
+}
+
+
+km1=matrix(NA,choose(ncol(m),t),choose(ncol(m),t))
+for(i in 1:choose(ncol(m),t)) {
+    for(j in 1:choose(ncol(m),t)) {
+w=pp[,,j]%*%ginv(t(pp[,,j])%*%(di-pm)%*%pp[,,j])%*%t(pp[,,j])%*%(di-pm)
+
+if(i!=j) km1[i,j]=tr(t(pp[,,i])%*%t(di-w)%*% (di-pm) %*% (di-w)%*% pp[,,i]%*%sigma0)
+else  km1[i,j]=10000
+}
+}
+
+
+
+
+##############################D2
+#D2 - Revstat
+x=matrix(c(
+1,-1,1,-1,
+1,1,-1,1,
+-1,1,1,-1,
+1,-1,1,1,
+1,1,-1,1,
+1,1,1,-1,
+-1,1,1,1,
+-1,-1,1,1,
+-1,-1,-1,1,
+1,-1,-1,-1,
+-1,1,-1,-1,
+-1,-1,-1,-1
+),12,4,byrow=T)
+
+
+
+di=diag(rep(1,12))
+
+
+mp2=c()
+for(i in 1:12)  {
+#if(sum(x[i,])==4 | sum(x[i,])==-4)  mp2[i]=ph
+if(sum(x[i,])==4 )  mp2[i]=ph
+
+else(mp2[i]=pl)
+               }
+
+pm=diag(mp2)
+###########    fully observed ,2factor interactions ##########
+ab=cbind(x[,1]*x[,2])
+ac=cbind(x[,1]*x[,3])
+ad=cbind(x[,1]*x[,4])
+bc=cbind(x[,2]*x[,3])
+bd=cbind(x[,2]*x[,4])
+cd=cbind(x[,3]*x[,4])
+
+m2=cbind(ab,ac,ad,bc,bd,cd)
+m=cbind(m2)
+m=as.data.frame(m)
+comb=combn(m,t,simplify=FALSE)
+qq=array(NA,dim=c(12,t,choose(ncol(m),t)))
+
+for(i in 1:choose(ncol(m),t)) {
+qq[,,i]=as.matrix(comb[[i]])
+}
+
+pp=array(NA,dim=c(12,4+t,choose(ncol(m),t)))
+
+for(i in 1:choose(ncol(m),t)) {
+pp[,,i]=cbind(x,qq[,,i])
+}
+
+k2=matrix(NA,choose(ncol(m),t),choose(ncol(m),t))
+for(i in 1:choose(ncol(m),t)) {
+    for(j in 1:choose(ncol(m),t)) {
+h=pp[,,j]%*%ginv(t(pp[,,j])%*%pp[,,j])%*%t(pp[,,j])
+if(i!=j) k2[i,j]=tr(t(pp[,,i])%*%(di-h)%*%pp[,,i]%*%sigma0)
+else  k2[i,j]=10000
+}
+}
+
+
+km2=matrix(NA,choose(ncol(m),t),choose(ncol(m),t))
+for(i in 1:choose(ncol(m),t)) {
+    for(j in 1:choose(ncol(m),t)) {
+w=pp[,,j]%*%ginv(t(pp[,,j])%*%(di-pm)%*%pp[,,j])%*%t(pp[,,j])%*%(di-pm)
+
+if(i!=j) km2[i,j]=tr(t(pp[,,i])%*%t(di-w)%*% (di-pm) %*% (di-w)%*% pp[,,i]%*%sigma0)
+else  km2[i,j]=10000
+}
+}
+
+
+
+##############################D3
+#D3 - Revstat
+x=matrix(c(
+1,1,1,1,
+1,-1,1,1,
+-1,-1,1,1,
+-1,1,-1,1,
+1,-1,-1,1,
+-1,-1,-1,1,
+-1,1,1,-1,
+1,-1,1,-1,
+-1,-1,1,-1,
+1,1,-1,-1,
+1,-1,-1,-1,
+-1,-1,-1,-1
+),12,4,byrow=T)
+
+
+di=diag(rep(1,12))
+
+
+mp3=c()
+for(i in 1:12)  {
+#if(sum(x[i,])==4 | sum(x[i,])==-4)  mp3[i]=ph
+if(sum(x[i,])==4)  mp3[i]=ph
+
+else(mp3[i]=pl)
+               }
+pm=diag(mp3)
+###########    fully observed ,2factor interactions ##########
+ab=cbind(x[,1]*x[,2])
+ac=cbind(x[,1]*x[,3])
+ad=cbind(x[,1]*x[,4])
+bc=cbind(x[,2]*x[,3])
+bd=cbind(x[,2]*x[,4])
+cd=cbind(x[,3]*x[,4])
+
+m2=cbind(ab,ac,ad,bc,bd,cd)
+m=cbind(m2)
+m=as.data.frame(m)
+comb=combn(m,t,simplify=FALSE)
+qq=array(NA,dim=c(12,t,choose(ncol(m),t)))
+
+for(i in 1:choose(ncol(m),t)) {
+qq[,,i]=as.matrix(comb[[i]])
+}
+
+pp=array(NA,dim=c(12,4+t,choose(ncol(m),t)))
+
+for(i in 1:choose(ncol(m),t)) {
+pp[,,i]=cbind(x,qq[,,i])
+}
+
+k3=matrix(NA,choose(ncol(m),t),choose(ncol(m),t))
+for(i in 1:choose(ncol(m),t)) {
+    for(j in 1:choose(ncol(m),t)) {
+h=pp[,,j]%*%ginv(t(pp[,,j])%*%pp[,,j])%*%t(pp[,,j])
+if(i!=j) k3[i,j]=tr(t(pp[,,i])%*%(di-h)%*%pp[,,i]%*%sigma0)
+else  k3[i,j]=10000
+}
+}
+
+
+km3=matrix(NA,choose(ncol(m),t),choose(ncol(m),t))
+for(i in 1:choose(ncol(m),t)) {
+    for(j in 1:choose(ncol(m),t)) {
+w=pp[,,j]%*%ginv(t(pp[,,j])%*%(di-pm)%*%pp[,,j])%*%t(pp[,,j])%*%(di-pm)
+
+if(i!=j) km3[i,j]=tr(t(pp[,,i])%*%t(di-w)%*% (di-pm) %*% (di-w)%*% pp[,,i]%*%sigma0)
+else  km3[i,j]=10000
+}
+}
+
+
+
+min(km1)
+min(km2)
+min(km3)
+min(km1)/8
+min(km2)/7.619
+min(km3)/8

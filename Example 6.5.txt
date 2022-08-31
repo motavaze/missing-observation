@@ -1,0 +1,164 @@
+library(MASS)
+library(psych)
+library(mice)
+
+
+b0=-1
+b1=0
+b2=-1
+b3=0.5
+b4=0
+
+
+mp1=c()
+mp2=c()
+mp3=c()
+
+mm=function(A,B,C,D) {
+exp(b0+b1*A+b2*B+b3*C+b4*D)/(1+exp(b0+b1*A+b2*B+b3*C+b4*D))
+}
+
+k=1
+#####################################D1
+#D1 - Revstat
+x=matrix(c(
+1,1,1,1,
+-1,-1,-1,-1,
+-1,-1,-1,1,
+-1,-1,1,-1,
+-1,1,-1,-1,
+1,-1,-1,-1,
+-1,-1,1,1,
+-1,1,-1,1,
+1,-1,-1,1,
+-1,1,1,-1,
+1,-1,1,-1,
+1,1,-1,-1
+),12,4,byrow=T)
+
+ab=cbind(x[,1]*x[,2])
+ac=cbind(x[,1]*x[,3])
+ad=cbind(x[,1]*x[,4])
+bc=cbind(x[,2]*x[,3])
+bd=cbind(x[,2]*x[,4])
+cd=cbind(x[,3]*x[,4])
+
+m2=cbind(ab,ac,ad,bc,bd,cd)
+
+for(i in 1:12) {
+               mp1[i]=mm(x[i,1],x[i,2],x[i,3],x[i,4])
+               }
+mp1=diag(mp1)
+
+detm1=c()
+det1=c()
+
+m=cbind(m2)
+m=as.data.frame(m)
+comb=combn(m,k,simplify=FALSE)
+qq=array(NA,dim=c(12,4+k,choose(ncol(m),k)))
+for(i in 1:choose(ncol(m),k)) {
+qq[,,i]=as.matrix(cbind(x,comb[[i]]))
+detm1[i]=det(t(qq[,,i])%*% ((diag(12)-mp1)) %*%(qq[,,i]))
+det1[i]=det(t(qq[,,i])%*%(qq[,,i]))
+
+}
+
+#####################################D2
+#D2 - Revstat
+x=matrix(c(
+1,-1,1,-1,
+1,1,-1,1,
+-1,1,1,-1,
+1,-1,1,1,
+1,1,-1,1,
+1,1,1,-1,
+-1,1,1,1,
+-1,-1,1,1,
+-1,-1,-1,1,
+1,-1,-1,-1,
+-1,1,-1,-1,
+-1,-1,-1,-1
+),12,4,byrow=T)
+
+ab=cbind(x[,1]*x[,2])
+ac=cbind(x[,1]*x[,3])
+ad=cbind(x[,1]*x[,4])
+bc=cbind(x[,2]*x[,3])
+bd=cbind(x[,2]*x[,4])
+cd=cbind(x[,3]*x[,4])
+
+m2=cbind(ab,ac,ad,bc,bd,cd)
+
+for(i in 1:12) {
+               mp2[i]=mm(x[i,1],x[i,2],x[i,3],x[i,4])
+               }
+mp2=diag(mp2)
+
+detm2=c()
+det2=c()
+
+m=cbind(m2)
+m=as.data.frame(m)
+comb=combn(m,k,simplify=FALSE)
+qq=array(NA,dim=c(12,4+k,choose(ncol(m),k)))
+for(i in 1:choose(ncol(m),k)) {
+qq[,,i]=as.matrix(cbind(x,comb[[i]]))
+detm2[i]=det(t(qq[,,i])%*% ((diag(12)-mp2)) %*%(qq[,,i]))
+det2[i]=det(t(qq[,,i])%*% (qq[,,i]))
+
+}
+
+##########################D3
+x=matrix(c(
+1,1,1,1,
+1,-1,1,1,
+-1,-1,1,1,
+-1,1,-1,1,
+1,-1,-1,1,
+-1,-1,-1,1,
+-1,1,1,-1,
+1,-1,1,-1,
+-1,-1,1,-1,
+1,1,-1,-1,
+1,-1,-1,-1,
+-1,-1,-1,-1
+),12,4,byrow=T)
+
+ab=cbind(x[,1]*x[,2])
+ac=cbind(x[,1]*x[,3])
+ad=cbind(x[,1]*x[,4])
+bc=cbind(x[,2]*x[,3])
+bd=cbind(x[,2]*x[,4])
+cd=cbind(x[,3]*x[,4])
+
+m2=cbind(ab,ac,ad,bc,bd,cd)
+
+for(i in 1:12) {
+               mp3[i]=mm(x[i,1],x[i,2],x[i,3],x[i,4])
+               }
+mp3=diag(mp3)
+
+detm3=c()
+det3=c()
+
+m=cbind(m2)
+m=as.data.frame(m)
+comb=combn(m,k,simplify=FALSE)
+qq=array(NA,dim=c(12,4+k,choose(ncol(m),k)))
+for(i in 1:choose(ncol(m),k)) {
+qq[,,i]=as.matrix(cbind(x,comb[[i]]))
+detm3[i]=det(t(qq[,,i])%*% ((diag(12)-mp3)) %*%(qq[,,i]))
+det3[i]=det(t(qq[,,i]) %*%(qq[,,i]))
+
+}
+u=5+k
+(min(detm1)/min(det1))^(1/u)
+
+(min(detm2)/min(det2))^(1/u)
+
+(min(detm3)/min(det3))^(1/u)
+
+
+
+

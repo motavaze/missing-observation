@@ -1,0 +1,57 @@
+ library(psych)
+ library(MASS)
+ ############## input the design matrix
+ x=matrix(c(
+ 1,-1,-1,-1,
+ 1,1,-1,-1,
+ 1,-1,1,-1,
+ 1,1,1,-1,
+ 1,-1,-1,1,
+ 1,1,-1,1,
+ 1,-1,1,1,
+ 1,1,1,1)
+ ,8,4,byrow=T)
+ z=c(8+6,9+10,34+30,52+50,16+15,22+21,45+44,63+60)
+ modelt=lm(z~x[,2]+x[,3]+x[,4]+x[,2]:x[,3])
+ summary(modelt)
+ anova(modelt)
+a=0
+b=6
+
+ modelred=lm(z[-c(a,b)]~x[-c(a,b),2]+x[-c(a,b),3]+x[-c(a,b),4]+x[-c(a,b),2]:x[-c(a,b),3])
+ summary(modelred)
+ anova(modelred)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+set.seed(10)
+library(psych)
+library(MASS)
+############## input the design matrix
+x=matrix(c(
+1,-1,-1,-1,
+1,1,-1,-1,
+1,-1,1,-1,
+1,1,1,-1,
+1,-1,-1,1,
+1,1,-1,1,
+1,-1,1,1,
+1,1,1,1)
+,8,4,byrow=T)
+r=1000
+ct=0
+cred=0
+s=6
+alpha=0.01
+a=0
+b=6
+sigma=s*diag(8)
+xx=cbind(60.250+11.125*x[,2]+33.875*x[,3]+10.875*x[,4]+6.875*x[,2]*x[,3])
+mu=rowSums(xx)
+for(j in 1:r){
+y=matrix(t(mvrnorm(1,mu,sigma)),8,1)
+modelt=lm(y~x[,2]+x[,3]+x[,4]+x[,2]:x[,3])
+if(anova(modelt)[1,5]<=alpha&&anova(modelt)[2,5]<=alpha&&anova(modelt)[3,5]<=alpha&&anova(modelt)[4,5]<=alpha) ct=ct+1
+modelred=lm(y[-c(a,b),1]~x[-c(a,b),2]+x[-c(a,b),3]+x[-c(a,b),4]+x[-c(a,b),2]:x[-c(a,b),3])
+if(anova(modelred)[1,5]<=alpha&&anova(modelred)[2,5]<=alpha&&anova(modelred)[3,5]<=alpha&&anova(modelred)[4,5]<=alpha) cred=cred+1
+}
+ct
+cred

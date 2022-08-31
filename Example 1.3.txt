@@ -1,0 +1,78 @@
+library(psych)
+library(MASS)
+sigma0=diag(4)
+
+b0=-3
+b1=1
+b2=1
+b3=1
+
+##############################D1
+x=matrix(c(
+1,-1,-1,-1,
+1,1,-1,-1,
+1,-1,1,-1,
+1,1,1,-1,
+1,-1,-1,1,
+1,1,-1,1,
+1,-1,1,1,
+1,1,1,1)
+,8,4,byrow=T)
+
+run=8
+t=1
+di=diag(rep(1,run))
+
+
+mp1=c()
+mm=function(A,B,C) {
+exp(b0+b1*A+b2*B+b3*C)/(1+exp(b0+b1*A+b2*B+b3*C))
+}
+
+
+for(i in 1:run) {
+               mp1[i]=mm(x[i,2],x[i,3],x[i,4])
+               }
+pm=diag(mp1)
+###########    fully observed ,2factor interactions ##########
+ab=cbind(x[,2]*x[,3])
+ac=cbind(x[,2]*x[,4])
+bc=cbind(x[,3]*x[,4])
+
+m2=cbind(ab,ac,bc)
+m=cbind(m2)
+m=as.data.frame(m)
+comb=combn(m,t,simplify=FALSE)
+qq=array(NA,dim=c(run,t,choose(ncol(m),t)))
+
+for(i in 1:choose(ncol(m),t)) {
+qq[,,i]=as.matrix(comb[[i]])
+}
+
+pp=array(NA,dim=c(run,3+t,choose(ncol(m),t)))
+
+for(i in 1:choose(ncol(m),t)) {
+pp[,,i]=cbind(x[,-4],qq[,,i])
+}
+
+k1=matrix(NA,choose(ncol(m),t),choose(ncol(m),t))
+for(i in 1:choose(ncol(m),t)) {
+    for(j in 1:choose(ncol(m),t)) {
+h=pp[,,j]%*%ginv(t(pp[,,j])%*%pp[,,j])%*%t(pp[,,j])
+if(i!=j) k1[i,j]=tr(t(pp[,,i])%*%(di-h)%*%pp[,,i]%*%sigma0)
+else  k1[i,j]=10000
+}
+}
+
+
+km1=matrix(NA,choose(ncol(m),t),choose(ncol(m),t))
+for(i in 1:choose(ncol(m),t)) {
+    for(j in 1:choose(ncol(m),t)) {
+w=pp[,,j]%*%ginv(t(pp[,,j])%*%(di-pm)%*%pp[,,j])%*%t(pp[,,j])%*%(di-pm)
+
+if(i!=j) km1[i,j]=tr(t(pp[,,i])%*%t(di-w)%*% (di-pm) %*% (di-w)%*% pp[,,i]%*%sigma0)
+else  km1[i,j]=10000
+}
+}
+min(k1)
+min(km1)
